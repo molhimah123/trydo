@@ -18,6 +18,62 @@ A minimal, fast Todo Webapp built with Next.js 15 and Supabase for secure, real-
 - **Testing**: Jest, React Testing Library
 - **Deployment**: Vercel (frontend) + Supabase (backend)
 
+## 🚀 CI/CD Pipeline
+
+This project includes a comprehensive CI/CD pipeline with automated testing, building, and deployment.
+
+### **Pipeline Features**
+- ✅ **Automated Testing** - Jest + React Testing Library
+- ✅ **Code Quality** - ESLint + TypeScript validation
+- ✅ **Security Scanning** - npm audit + Snyk integration
+- ✅ **Performance Monitoring** - Bundle size analysis
+- ✅ **Multi-Environment Deployment** - Staging + Production
+- ✅ **Database Migrations** - Automated Supabase migrations
+- ✅ **Release Management** - Automated releases with changelogs
+
+### **Quick Start**
+```bash
+# Check CI/CD setup
+npm run check-cicd
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+
+# Deploy to staging
+git push origin develop
+
+# Deploy to production
+git push origin main
+```
+
+### **Documentation**
+- 📋 [CI/CD Overview](docs/cicd/README.md)
+- 🔧 [Setup Guide](docs/cicd/SETUP-GUIDE.md)
+- 🔐 [GitHub Secrets](docs/cicd/github-secrets.md)
+- 🚀 [Vercel Deployment](docs/cicd/vercel-deployment.md)
+- 🗄️ [Database Migrations](docs/cicd/database-migrations.md)
+
+### **Available Commands**
+```bash
+# Development
+npm run dev                 # Start development server
+npm run test               # Run tests
+npm run test:coverage      # Run tests with coverage
+npm run lint               # Run ESLint
+npm run build              # Build for production
+
+# Database Management
+npm run db:migrate         # Run migrations locally
+npm run db:status          # Check migration status
+npm run db:diff            # Check schema differences
+
+# CI/CD Utilities
+npm run check-cicd         # Verify CI/CD setup
+```
+
 ## Getting Started
 
 ### Prerequisites

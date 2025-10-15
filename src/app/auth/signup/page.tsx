@@ -12,6 +12,28 @@ export default function SignUpPage() {
   const [message, setMessage] = useState('')
   const { signUp } = useAuth()
 
+  // Password strength calculation
+  const getPasswordStrength = (password: string) => {
+    let score = 0
+    const checks = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    }
+
+    Object.values(checks).forEach(check => {
+      if (check) score++
+    })
+
+    return { score, checks }
+  }
+
+  const passwordStrength = getPasswordStrength(password)
+  const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong']
+  const strengthColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500']
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -91,6 +113,51 @@ export default function SignUpPage() {
               />
             </div>
           </div>
+
+          {/* Password Strength Indicator */}
+          {password && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Password strength:</span>
+                <span className={`font-medium ${
+                  passwordStrength.score <= 2 ? 'text-red-600' :
+                  passwordStrength.score <= 3 ? 'text-yellow-600' : 'text-green-600'
+                }`}>
+                  {strengthLabels[passwordStrength.score - 1] || 'Very Weak'}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    strengthColors[passwordStrength.score - 1] || 'bg-red-500'
+                  }`}
+                  style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-500 space-y-1">
+                <div className={`flex items-center ${passwordStrength.checks.length ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className="mr-1">{passwordStrength.checks.length ? '✓' : '○'}</span>
+                  At least 8 characters
+                </div>
+                <div className={`flex items-center ${passwordStrength.checks.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className="mr-1">{passwordStrength.checks.lowercase ? '✓' : '○'}</span>
+                  Lowercase letter
+                </div>
+                <div className={`flex items-center ${passwordStrength.checks.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className="mr-1">{passwordStrength.checks.uppercase ? '✓' : '○'}</span>
+                  Uppercase letter
+                </div>
+                <div className={`flex items-center ${passwordStrength.checks.number ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className="mr-1">{passwordStrength.checks.number ? '✓' : '○'}</span>
+                  Number
+                </div>
+                <div className={`flex items-center ${passwordStrength.checks.special ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className="mr-1">{passwordStrength.checks.special ? '✓' : '○'}</span>
+                  Special character
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="text-red-600 text-sm text-center">{error}</div>

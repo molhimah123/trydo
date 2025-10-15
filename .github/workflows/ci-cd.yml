@@ -61,6 +61,7 @@ jobs:
           file: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+        continue-on-error: true
 
   # Build and Test Build
   build:
@@ -145,9 +146,15 @@ jobs:
       - name: Analyze bundle size
         run: |
           echo "📊 Bundle size analysis:"
-          du -sh .next/static/chunks/* | head -10
+          if [ -d ".next/static/chunks" ]; then
+            du -sh .next/static/chunks/* | head -10
+          fi
           echo "Total build size:"
           du -sh .next/
+          
+          # Check for large bundles (>1MB)
+          echo "🔍 Checking for large bundles:"
+          find .next -name "*.js" -size +1M -exec ls -lh {} \;
 
   # Database Migration Check
   database-check:
@@ -242,6 +249,8 @@ jobs:
         run: |
           echo "🚀 Production deployment successful!"
           echo "Application deployed to: https://your-app.vercel.app"
+          echo "📊 Build completed at: $(date)"
+          echo "🔗 View deployment logs in GitHub Actions"
 
   # Cleanup
   cleanup:
