@@ -4,7 +4,15 @@ import SignUpPage from '@/app/auth/signup/page'
 // Mock AuthProvider
 jest.mock('@/components/AuthProvider', () => ({
   useAuth: () => ({
-    signUp: jest.fn().mockResolvedValue({ error: null }),
+    signUp: jest.fn().mockImplementation((email, password) => {
+      if (!email || !password) {
+        return Promise.resolve({ error: { message: 'Please fill in all fields' } })
+      }
+      if (password.length < 6) {
+        return Promise.resolve({ error: { message: 'Password must be at least 6 characters' } })
+      }
+      return Promise.resolve({ error: null })
+    }),
   }),
 }))
 

@@ -8,7 +8,19 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:status": "supabase migration list",
+    "db:diff": "supabase db diff --schema public",
+    "db:migrate:staging": "supabase db push --project-ref $STAGING_PROJECT_REF",
+    "db:migrate:production": "supabase db push --project-ref $PRODUCTION_PROJECT_REF",
+    "db:verify:staging": "supabase db diff --project-ref $STAGING_PROJECT_REF",
+    "db:verify:production": "supabase db diff --project-ref $PRODUCTION_PROJECT_REF",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.3.1",

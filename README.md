@@ -130,6 +130,51 @@ Run tests with:
 npm test
 ```
 
+## CI/CD Pipeline
+
+This project includes a comprehensive CI/CD pipeline with automated testing, building, and deployment.
+
+### Pipeline Features
+
+- **Automated Testing**: Unit tests, integration tests, and security scanning
+- **Multi-Environment Deployment**: Development, staging, and production
+- **Database Migration Automation**: Automated and manual migration workflows
+- **Security Scanning**: Dependency audits and code security analysis
+- **Release Management**: Automated releases with changelog generation
+
+### Quick Start
+
+1. **Set up GitHub Secrets** (see [CI/CD Documentation](docs/cicd/github-secrets.md))
+2. **Configure Vercel** (see [Vercel Deployment Guide](docs/cicd/vercel-deployment.md))
+3. **Set up Supabase** (see [Database Migration Guide](docs/cicd/database-migrations.md))
+
+### Deployment Workflow
+
+- **Push to `develop`** → Automatic staging deployment
+- **Push to `main`** → Automatic production deployment
+- **Create Pull Request** → Preview deployment and testing
+- **Create Git Tag** → Automated release and deployment
+
+### Available Commands
+
+```bash
+# Development
+npm run dev                 # Start development server
+npm run test               # Run tests
+npm run test:coverage      # Run tests with coverage
+npm run db:migrate         # Run database migrations locally
+
+# Database Management
+npm run db:status          # Check migration status
+npm run db:diff            # Check schema differences
+npm run supabase:start     # Start local Supabase
+npm run supabase:stop      # Stop local Supabase
+
+# Production
+npm run build              # Build for production
+npm run start              # Start production server
+```
+
 ## Deployment
 
 ### Frontend (Vercel)
@@ -144,6 +189,14 @@ npm test
 2. Run database migrations
 3. Configure RLS policies
 4. Set up authentication settings
+
+### CI/CD Documentation
+
+For detailed CI/CD setup and configuration, see:
+- [CI/CD Overview](docs/cicd/README.md)
+- [GitHub Secrets Setup](docs/cicd/github-secrets.md)
+- [Vercel Deployment](docs/cicd/vercel-deployment.md)
+- [Database Migrations](docs/cicd/database-migrations.md)
 
 ## Security Features
 

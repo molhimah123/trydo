@@ -10,7 +10,12 @@ jest.mock('next/navigation', () => ({
 // Mock AuthProvider
 jest.mock('@/components/AuthProvider', () => ({
   useAuth: () => ({
-    signIn: jest.fn().mockResolvedValue({ error: null }),
+    signIn: jest.fn().mockImplementation((email, password) => {
+      if (!email || !password) {
+        return Promise.resolve({ error: { message: 'Please fill in all fields' } })
+      }
+      return Promise.resolve({ error: null })
+    }),
   }),
 }))
 
