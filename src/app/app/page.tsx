@@ -1,12 +1,16 @@
 'use client'
 
 import { useAuth } from '@/components/AuthProvider'
+import { LogoutConfirmationDialog } from '@/components/LogoutConfirmationDialog'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function AppPage() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const [signOutError, setSignOutError] = useState('')
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -14,9 +18,34 @@ export default function AppPage() {
     }
   }, [user, loading, router])
 
-  const handleSignOut = async () => {
-    await signOut()
-    router.push('/auth/signin')
+  const handleSignOutClick = () => {
+    setShowLogoutDialog(true)
+  }
+
+  const handleSignOutConfirm = async () => {
+    setIsSigningOut(true)
+    setSignOutError('')
+    
+    try {
+      const { error } = await signOut()
+      if (error) {
+        setSignOutError('Failed to sign out. Please try again.')
+        setIsSigningOut(false)
+        setShowLogoutDialog(false)
+        return
+      }
+      
+      // Redirect to sign in page
+      router.push('/auth/signin')
+    } catch (err) {
+      setSignOutError('An unexpected error occurred. Please try again.')
+      setIsSigningOut(false)
+      setShowLogoutDialog(false)
+    }
+  }
+
+  const handleSignOutCancel = () => {
+    setShowLogoutDialog(false)
   }
 
   if (loading) {
@@ -44,15 +73,30 @@ export default function AppPage() {
                 Welcome, {user.email}
               </span>
               <button
-                onClick={handleSignOut}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                onClick={handleSignOutClick}
+                disabled={isSigningOut}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isSigningOut
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                }`}
               >
-                Sign Out
+                {isSigningOut ? 'Signing Out...' : 'Sign Out'}
               </button>
             </div>
           </div>
         </div>
       </nav>
+      
+      {signOutError && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{signOutError}</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
@@ -68,6 +112,13 @@ export default function AppPage() {
           </div>
         </div>
       </main>
+
+      <LogoutConfirmationDialog
+        isOpen={showLogoutDialog}
+        onConfirm={handleSignOutConfirm}
+        onCancel={handleSignOutCancel}
+        isLoading={isSigningOut}
+      />
     </div>
   )
 }
