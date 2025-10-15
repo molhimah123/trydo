@@ -1,0 +1,20 @@
+# Architecture — Simple Todo Webapp (Supabase MVP)
+
+## Table of Contents
+
+- [Architecture — Simple Todo Webapp (Supabase MVP)](#table-of-contents)
+  - [1) System Context](#1-system-context)
+  - [2) Core Components](#2-core-components)
+  - [3) Data Model (DDL)](#3-data-model-ddl)
+  - [4) API Surface (PostgREST + optional RPC)](#4-api-surface-postgrest-optional-rpc)
+  - [5) Key Flows (Sequence)](#5-key-flows-sequence)
+  - [6) Frontend Architecture](#6-frontend-architecture)
+  - [7) Security](#7-security)
+  - [8) Performance](#8-performance)
+  - [9) Observability & Errors](#9-observability-errors)
+  - [10) CI/CD & Environments](#10-cicd-environments)
+  - [11) Configuration & Secrets](#11-configuration-secrets)
+  - [12) Backup, Retention, DR](#12-backup-retention-dr)
+  - [13) Accessibility & i18n](#13-accessibility-i18n)
+  - [14) Risks & Mitigations](#14-risks-mitigations)
+  - [15) Minimal Cut List (if needed)](#15-minimal-cut-list-if-needed)
