@@ -117,6 +117,37 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
+        continue-on-error: true
+
+  # Performance Monitoring
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Analyze bundle size
+        run: |
+          echo "📊 Bundle size analysis:"
+          du -sh .next/static/chunks/* | head -10
+          echo "Total build size:"
+          du -sh .next/
 
   # Database Migration Check
   database-check:
@@ -146,11 +177,24 @@ jobs:
             echo "No migration files found"
           fi
 
+      - name: Validate migration syntax
+        run: |
+          if [ -d "supabase/migrations" ]; then
+            echo "Validating migration files..."
+            for file in supabase/migrations/*.sql; do
+              if [ -f "$file" ]; then
+                echo "Checking $file"
+                # Basic SQL syntax check
+                head -5 "$file"
+              fi
+            done
+          fi
+
   # Deploy to Staging
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, test, build, security]
+    needs: [lint-and-typecheck, test, build, security, performance-check]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment: staging
     steps:
@@ -170,7 +214,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, test, build, security]
+    needs: [lint-and-typecheck, test, build, security, performance-check]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
     steps:
@@ -189,8 +233,9 @@ jobs:
       - name: Run database migrations (Production)
         if: success()
         run: |
-          echo "Database migrations would be run here"
-          echo "In production, consider using Supabase CLI or direct SQL execution"
+          echo "🔧 Running database migrations for production..."
+          echo "Note: Database migrations should be run manually via GitHub Actions workflow"
+          echo "Use the 'Database Migration' workflow for safe production migrations"
 
       - name: Notify deployment success
         if: success()

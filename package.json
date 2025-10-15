@@ -20,7 +20,8 @@
     "db:verify:production": "supabase db diff --project-ref $PRODUCTION_PROJECT_REF",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
-    "supabase:status": "supabase status"
+    "supabase:status": "supabase status",
+    "check-cicd": "bash scripts/check-cicd.sh"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.3.1",
