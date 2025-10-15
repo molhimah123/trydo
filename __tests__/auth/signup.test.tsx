@@ -30,7 +30,8 @@ describe('SignUpPage', () => {
     render(<SignUpPage />)
     
     const submitButton = screen.getByRole('button', { name: 'Create account' })
-    fireEvent.click(submitButton)
+    const form = submitButton.closest('form')
+    fireEvent.submit(form)
     
     await waitFor(() => {
       expect(screen.getByText('Please fill in all fields')).toBeInTheDocument()

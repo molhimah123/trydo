@@ -45,11 +45,14 @@ describe('SignInPage', () => {
     render(<SignInPage />)
     
     const submitButton = screen.getByRole('button', { name: 'Sign in' })
-    fireEvent.click(submitButton)
+    const form = submitButton.closest('form')
+    fireEvent.submit(form)
     
+    // The validation happens in the component before calling the auth function
+    // So we need to wait for the error message to appear
     await waitFor(() => {
       expect(screen.getByText('Please fill in all fields')).toBeInTheDocument()
-    })
+    }, { timeout: 1000 })
   })
 
   it('submits form with valid data', async () => {
