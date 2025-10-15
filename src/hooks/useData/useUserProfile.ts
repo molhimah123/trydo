@@ -7,7 +7,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import type { User } from '@supabase/supabase-js';
 
 // React-Database Developer Responsibilities:
 // 1. Create optimized database queries
@@ -33,6 +32,7 @@ interface UseUserProfileState {
 }
 
 interface UseUserProfileActions {
+  // eslint-disable-next-line no-unused-vars
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
 }

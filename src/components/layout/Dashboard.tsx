@@ -6,10 +6,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Button } from './ui/Button';
-import { Card } from './ui/Card';
-import { Input } from './forms/Input';
-import styles from '../styles/components/Dashboard.module.css';
+import Image from 'next/image';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Input } from '../forms/Input';
+import styles from '../../styles/components/Dashboard.module.css';
 
 // Frontend Developer Responsibilities:
 // 1. Create reusable UI components
@@ -20,6 +21,7 @@ import styles from '../styles/components/Dashboard.module.css';
 
 interface DashboardProps {
   userId: string;
+  // eslint-disable-next-line no-unused-vars
   onUserUpdate?: (user: User) => void;
 }
 
@@ -51,7 +53,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, onUserUpdate }) =>
           email: 'john@example.com',
           avatar: '/default-avatar.png'
         });
-      } catch (err) {
+      } catch {
         setError('Failed to load user data');
       } finally {
         setIsLoading(false);
@@ -100,9 +102,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ userId, onUserUpdate }) =>
       <header className={styles.header}>
         <h1>Welcome back, {user?.name}!</h1>
         <div className={styles.avatar}>
-          <img 
+          <Image 
             src={user?.avatar || '/default-avatar.png'} 
             alt={`${user?.name}'s avatar`}
+            width={40}
+            height={40}
             className={styles.avatarImage}
           />
         </div>

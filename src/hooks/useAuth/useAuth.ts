@@ -25,9 +25,12 @@ interface AuthState {
 }
 
 interface AuthActions {
+  // eslint-disable-next-line no-unused-vars
   signIn: (email: string, password: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   resetPassword: (email: string) => Promise<void>;
 }
 

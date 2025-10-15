@@ -37,7 +37,7 @@ export default function AppPage() {
       
       // Redirect to sign in page
       router.push('/auth/signin')
-    } catch (err) {
+    } catch {
       setSignOutError('An unexpected error occurred. Please try again.')
       setIsSigningOut(false)
       setShowLogoutDialog(false)
