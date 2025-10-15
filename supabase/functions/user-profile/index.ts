@@ -1,0 +1,252 @@
+/**
+ * Backend-API Developer Example Edge Function
+ * 
+ * This file demonstrates the responsibilities and patterns
+ * for backend-api developers working on server-side logic.
+ */
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+// Backend-API Developer Responsibilities:
+// 1. Implement server-side business logic
+// 2. Handle API endpoints and routing
+// 3. Manage authentication and authorization
+// 4. Implement data validation and sanitization
+// 5. Handle error responses and logging
+// 6. Optimize for performance and security
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string;
+}
+
+interface UpdateProfileRequest {
+  name?: string;
+  avatar_url?: string;
+}
+
+serve(async (req) => {
+  // Backend-API developer handles CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    // Backend-API developer sets up Supabase client with service role
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Backend-API developer handles authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    // Verify JWT token
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid token' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    // Backend-API developer handles different HTTP methods
+    switch (req.method) {
+      case 'GET':
+        return await handleGetProfile(supabaseClient, user.id)
+      
+      case 'PUT':
+        return await handleUpdateProfile(supabaseClient, user.id, req)
+      
+      case 'DELETE':
+        return await handleDeleteProfile(supabaseClient, user.id)
+      
+      default:
+        return new Response(
+          JSON.stringify({ error: 'Method not allowed' }),
+          { 
+            status: 405, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+    }
+
+  } catch (error) {
+    // Backend-API developer handles errors gracefully
+    console.error('Profile API Error:', error)
+    
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+})
+
+// Backend-API developer implements GET profile endpoint
+async function handleGetProfile(supabaseClient: any, userId: string) {
+  const { data: profile, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error) {
+    return new Response(
+      JSON.stringify({ error: 'Failed to fetch profile' }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+
+  return new Response(
+    JSON.stringify({ profile }),
+    { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    }
+  )
+}
+
+// Backend-API developer implements PUT profile endpoint
+async function handleUpdateProfile(supabaseClient: any, userId: string, req: Request) {
+  const body: UpdateProfileRequest = await req.json()
+  
+  // Backend-API developer validates input data
+  if (!body.name && !body.avatar_url) {
+    return new Response(
+      JSON.stringify({ error: 'No valid fields to update' }),
+      { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+
+  // Backend-API developer sanitizes and validates data
+  const updates: Partial<UserProfile> = {}
+  
+  if (body.name) {
+    const sanitizedName = body.name.trim()
+    if (sanitizedName.length < 2 || sanitizedName.length > 100) {
+      return new Response(
+        JSON.stringify({ error: 'Name must be between 2 and 100 characters' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+    updates.name = sanitizedName
+  }
+
+  if (body.avatar_url) {
+    // Backend-API developer validates URL format
+    try {
+      new URL(body.avatar_url)
+      updates.avatar_url = body.avatar_url
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Invalid avatar URL format' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+  }
+
+  // Backend-API developer performs database update
+  const { data: updatedProfile, error } = await supabaseClient
+    .from('profiles')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select()
+    .single()
+
+  if (error) {
+    return new Response(
+      JSON.stringify({ error: 'Failed to update profile' }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+
+  return new Response(
+    JSON.stringify({ profile: updatedProfile }),
+    { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    }
+  )
+}
+
+// Backend-API developer implements DELETE profile endpoint
+async function handleDeleteProfile(supabaseClient: any, userId: string) {
+  const { error } = await supabaseClient
+    .from('profiles')
+    .delete()
+    .eq('id', userId)
+
+  if (error) {
+    return new Response(
+      JSON.stringify({ error: 'Failed to delete profile' }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+
+  return new Response(
+    JSON.stringify({ message: 'Profile deleted successfully' }),
+    { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    }
+  )
+}
+
+// Backend-API Developer Notes:
+// - This edge function handles user profile management
+// - Implements proper authentication and authorization
+// - Validates and sanitizes input data
+// - Handles errors gracefully with proper HTTP status codes
+// - Follows RESTful API conventions
+// - Implements CORS for cross-origin requests
+// - Uses Supabase service role for elevated permissions
+// - Includes proper logging for debugging
