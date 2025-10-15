@@ -10,6 +10,7 @@ import styles from './Input.module.css';
 interface InputProps {
   id?: string;
   value: string;
+  // eslint-disable-next-line no-unused-vars
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   type?: 'text' | 'email' | 'password' | 'number';
