@@ -52,15 +52,19 @@ jobs:
                 echo "✅ $branch is up to date with main"
               else
                 echo "⚠️  $branch is behind main - potential conflicts"
-                git log --oneline origin/main..origin/$branch
+                git log --oneline origin/main..origin/$branch || echo "No commits to show"
               fi
               
-              # Check for conflicts with develop
-              if git merge-base --is-ancestor origin/$branch origin/develop; then
-                echo "✅ $branch is up to date with develop"
+              # Check for conflicts with develop (only if develop exists)
+              if git show-ref --verify --quiet refs/remotes/origin/develop; then
+                if git merge-base --is-ancestor origin/$branch origin/develop; then
+                  echo "✅ $branch is up to date with develop"
+                else
+                  echo "⚠️  $branch is behind develop - potential conflicts"
+                  git log --oneline origin/develop..origin/$branch || echo "No commits to show"
+                fi
               else
-                echo "⚠️  $branch is behind develop - potential conflicts"
-                git log --oneline origin/develop..origin/$branch
+                echo "ℹ️  develop branch does not exist - skipping develop comparison"
               fi
             else
               echo "❌ Branch $branch does not exist"
@@ -80,7 +84,7 @@ jobs:
               echo "Checking file conflicts for $branch:"
               
               # Get files modified in this branch compared to main
-              FILES=$(git diff --name-only origin/main...origin/$branch)
+              FILES=$(git diff --name-only origin/main...origin/$branch 2>/dev/null || echo "")
               
               if [ -n "$FILES" ]; then
                 echo "Files modified in $branch:"
@@ -89,17 +93,21 @@ jobs:
                 # Check for conflicts with other developer branches
                 for other_branch in "${DEVELOPER_BRANCHES[@]}"; do
                   if [ "$branch" != "$other_branch" ] && git show-ref --verify --quiet refs/remotes/origin/$other_branch; then
-                    OTHER_FILES=$(git diff --name-only origin/main...origin/$other_branch)
+                    OTHER_FILES=$(git diff --name-only origin/main...origin/$other_branch 2>/dev/null || echo "")
                     
-                    # Find common files
-                    COMMON_FILES=$(comm -12 <(echo "$FILES" | sort) <(echo "$OTHER_FILES" | sort))
-                    
-                    if [ -n "$COMMON_FILES" ]; then
-                      echo "⚠️  Potential conflicts between $branch and $other_branch:"
-                      echo "$COMMON_FILES"
+                    if [ -n "$OTHER_FILES" ]; then
+                      # Find common files
+                      COMMON_FILES=$(comm -12 <(echo "$FILES" | sort) <(echo "$OTHER_FILES" | sort) 2>/dev/null || echo "")
+                      
+                      if [ -n "$COMMON_FILES" ]; then
+                        echo "⚠️  Potential conflicts between $branch and $other_branch:"
+                        echo "$COMMON_FILES"
+                      fi
                     fi
                   fi
                 done
+              else
+                echo "No files modified in $branch"
               fi
               echo "---"
             fi
@@ -130,9 +138,15 @@ jobs:
             if git show-ref --verify --quiet refs/remotes/origin/$branch; then
               echo "### $branch Branch" >> "$REPORT_FILE"
               echo "- **Status**: Active" >> "$REPORT_FILE"
-              echo "- **Last Commit**: $(git log -1 --format='%h %s' origin/$branch)" >> "$REPORT_FILE"
-              echo "- **Behind Main**: $(git rev-list --count origin/main..origin/$branch) commits" >> "$REPORT_FILE"
-              echo "- **Behind Develop**: $(git rev-list --count origin/develop..origin/$branch) commits" >> "$REPORT_FILE"
+              echo "- **Last Commit**: $(git log -1 --format='%h %s' origin/$branch 2>/dev/null || echo 'Unable to get commit info')" >> "$REPORT_FILE"
+              echo "- **Behind Main**: $(git rev-list --count origin/main..origin/$branch 2>/dev/null || echo '0') commits" >> "$REPORT_FILE"
+              
+              # Only check develop if it exists
+              if git show-ref --verify --quiet refs/remotes/origin/develop; then
+                echo "- **Behind Develop**: $(git rev-list --count origin/develop..origin/$branch 2>/dev/null || echo '0') commits" >> "$REPORT_FILE"
+              else
+                echo "- **Behind Develop**: N/A (develop branch does not exist)" >> "$REPORT_FILE"
+              fi
               echo "" >> "$REPORT_FILE"
             else
               echo "### $branch Branch" >> "$REPORT_FILE"
