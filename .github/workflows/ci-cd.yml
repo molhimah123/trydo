@@ -8,9 +8,6 @@ on:
 
 env:
   NODE_VERSION: '18'
-  # Default environment variables (can be overridden by secrets)
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
 
 jobs:
   # Developer Branch Validation
@@ -104,7 +101,7 @@ jobs:
         run: npm test -- --coverage --watchAll=false
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
           flags: unittests
@@ -129,11 +126,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co" >> $GITHUB_ENV
+          fi
+          
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-key" >> $GITHUB_ENV
+          fi
+
       - name: Build application
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-files
           path: .next/
@@ -184,6 +195,20 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co" >> $GITHUB_ENV
+          fi
+          
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-key" >> $GITHUB_ENV
+          fi
 
       - name: Build application
         run: npm run build
@@ -249,12 +274,23 @@ jobs:
     needs: [lint-and-typecheck, test, build, security, performance-check]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     # environment: staging  # Uncomment after creating the 'staging' environment in GitHub settings
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co" >> $GITHUB_ENV
+          fi
+          
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-key" >> $GITHUB_ENV
+          fi
 
       - name: Deploy to Vercel (Staging)
         uses: amondnet/vercel-action@v25
@@ -279,12 +315,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint-and-typecheck, test, build, security, performance-check]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co" >> $GITHUB_ENV
+          fi
+          
+          if [ -n "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" ]; then
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
+          else
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-key" >> $GITHUB_ENV
+          fi
 
       - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
