@@ -279,7 +279,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint-and-typecheck, test, build, security, performance-check]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    # environment: production  # Uncomment when environment is created in GitHub settings
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
