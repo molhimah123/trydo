@@ -76,6 +76,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       return { error }
     } catch (err) {
+      // Clear local state even if signOut fails
+      setUser(null)
+      setSession(null)
+      
+      // Clear any cached data even if signOut fails
+      if (typeof window !== 'undefined') {
+        localStorage.clear()
+        sessionStorage.clear()
+      }
+      
       return { error: err }
     }
   }

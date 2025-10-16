@@ -19,9 +19,8 @@ describe('LogoutConfirmationDialog', () => {
       />
     )
 
-    expect(screen.getByText('Sign Out')).toBeInTheDocument()
-    expect(screen.getByText('Are you sure you want to sign out?')).toBeInTheDocument()
-    expect(screen.getByText('You will need to sign in again to access your account.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Sign Out' })).toBeInTheDocument()
+    expect(screen.getByText('Are you sure you want to sign out? You will need to sign in again to access your account.')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
   })
 
@@ -49,7 +48,7 @@ describe('LogoutConfirmationDialog', () => {
       />
     )
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(confirmButton)
 
     expect(mockOnConfirm).toHaveBeenCalledTimes(1)
@@ -82,7 +81,7 @@ describe('LogoutConfirmationDialog', () => {
     )
 
     expect(screen.getByText('Signing Out...')).toBeInTheDocument()
-    expect(screen.queryByText('Sign Out')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sign Out' })).not.toBeInTheDocument()
   })
 
   it('disables buttons when isLoading is true', () => {
@@ -112,7 +111,7 @@ describe('LogoutConfirmationDialog', () => {
       />
     )
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getByRole('button', { name: 'Sign Out' })
     const cancelButton = screen.getByText('Cancel')
 
     expect(confirmButton).toHaveClass('focus:outline-none', 'focus:ring-2', 'focus:ring-red-500')
@@ -129,8 +128,8 @@ describe('LogoutConfirmationDialog', () => {
       />
     )
 
-    // Check for the SVG icon (logout icon)
-    const icon = screen.getByRole('img', { hidden: true })
-    expect(icon).toBeInTheDocument()
+    // Check for the SVG icon (logout icon) - it should be present in the DOM
+    const iconContainer = screen.getByRole('heading', { name: 'Sign Out' }).closest('div')?.querySelector('svg')
+    expect(iconContainer).toBeInTheDocument()
   })
 })

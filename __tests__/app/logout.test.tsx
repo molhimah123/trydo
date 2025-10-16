@@ -63,25 +63,25 @@ describe('AppPage - Logout Functionality', () => {
   it('shows logout confirmation dialog when sign out is clicked', () => {
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    expect(screen.getByText('Are you sure you want to sign out?')).toBeInTheDocument()
+    expect(screen.getByText('Are you sure you want to sign out? You will need to sign in again to access your account.')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
-    expect(screen.getByText('Sign Out')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign Out' })).toBeInTheDocument()
   })
 
   it('closes dialog when cancel is clicked', async () => {
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
     const cancelButton = screen.getByText('Cancel')
     fireEvent.click(cancelButton)
 
     await waitFor(() => {
-      expect(screen.queryByText('Are you sure you want to sign out?')).not.toBeInTheDocument()
+      expect(screen.queryByText('Are you sure you want to sign out? You will need to sign in again to access your account.')).not.toBeInTheDocument()
     })
   })
 
@@ -97,10 +97,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -124,10 +124,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     expect(screen.getByText('Signing Out...')).toBeInTheDocument()
@@ -149,10 +149,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -173,10 +173,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -198,10 +198,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -224,10 +224,10 @@ describe('AppPage - Logout Functionality', () => {
 
     render(<AppPage />)
 
-    const signOutButton = screen.getByText('Sign Out')
+    const signOutButton = screen.getByRole('button', { name: 'Sign Out' })
     fireEvent.click(signOutButton)
 
-    const confirmButton = screen.getByText('Sign Out')
+    const confirmButton = screen.getAllByRole('button', { name: 'Sign Out' })[1] // Get the dialog button
     fireEvent.click(confirmButton)
 
     // Check that the main sign out button is disabled
